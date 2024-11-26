@@ -1,0 +1,884 @@
+var sizeX = 64;
+var sizeY = 64;
+var using64 = true;
+var using32;
+var using16;
+var using8;
+var count = 6; // Count for the for loop of the drawing grass blade process
+var xLoc = 0;
+var yLoc = 0;
+//var bladeSize = sizeX/8;
+var bladeSize = (1/16) * sizeX;
+//or we can determine bladeSize with 1/16 x blade size...
+//If we do this, remove the bladeSize/2 we have on the flowers
+var button; //Generating grass button
+var recColor1Button;
+var recColor2Button;
+var recColor3Button;
+let currentCanvasButton;
+
+
+var usedPositions = []; // List of X positions of grass we've already used.
+
+let green1, green2, green3;
+let autumnBase, autumnLight, autumnDark;
+let snowyBase, snowyLight, snowyDark;
+
+let currentColorBG, currentColorGB, currentColorGS;
+
+let displayCanvas;
+var grassImage;
+let grassImageElement; // To display the generated grass image in HTML
+var rowCount = 0;
+var yOffset = 200;
+// Create an array to hold all grass image elements
+let grassImageElements = [];
+var grassImage;
+var dataURL;
+
+var savedGrass1;
+var dataURL1;
+
+var savedGrass2;
+var dataURL2;
+var savedGrass3;
+var dataURL3;
+
+let savedCopy1; //IMAGE ELEMENT FOR THE COPIES
+let savedCopy2; //IMAGE ELEMENT FOR THE COPIES (2)
+let savedCopy3; //IMAGE ELEMENT FOR THE COPIES (3)
+
+let sprite;
+let playerElement; // Variable to hold the player HTML image element
+var playerX = 40
+var playerY = 333
+var playerSpeed = 3;
+var keyMap = {}; // Object to keep track of key states
+var isFacingRight;
+var usingCurrentCanvas = true;
+
+let input1, input2, input3;
+let warningMessage;
+var percentageValues;
+var invalidPercentage = false;
+
+function preload(){
+  //Load all of our sprites
+  sprite64 = loadImage("Player64x64Gif.gif");
+  sprite32 = loadImage("Player32x32Gif.gif");
+  sprite16 = loadImage("Player16x16Gif.gif");
+}
+
+function setup() {
+  
+  displayCanvas = createCanvas(sizeX, sizeY);
+  displayCanvas.position = (0,0);
+  button = createButton("Generate Grass!");
+  button.position(0, 80);
+  
+  recColor1Button = createButton("Standard Color");
+  recColor1Button.position(0, 130);
+  recColor2Button = createButton("Autumn Color");
+  recColor2Button.position(120, 130);
+  recColor3Button = createButton("Winter Color");
+  recColor3Button.position(240, 130);
+  
+  button64 = createButton("Size: 64x64");
+  button32 = createButton("Size: 32x32");
+  button16 = createButton("Size: 16x16");
+  button8 = createButton("Size: 8x8");
+  
+  buttonDownload = createButton("Download! (Current Canvas)");
+  buttonDownload1 = createButton("Download!");
+  buttonDownload2 = createButton("Download!");
+  buttonDownload3 = createButton("Download!");
+  
+  saveButton1 = createButton("Save");
+  saveButton2 = createButton("Save");
+  saveButton3 = createButton("Save");
+  
+  currentCanvasButton = createButton('☑ Use Current Canvas');
+  currentCanvasButton.mousePressed(toggleState);
+  
+  applyButton = createButton("Apply Custom Tiles!")
+  
+  button64.position(0, 220);
+  button32.position(100, 220);
+  button16.position(200, 220);
+  button8.position(300, 220);
+  
+  buttonDownload.position(0, 250);
+  buttonDownload1.position(500, 145);
+  buttonDownload2.position(500, 245);
+  buttonDownload3.position(500, 345);
+  
+  saveButton1.position(500, 120);
+  saveButton2.position(500, 220);
+  saveButton3.position(500, 320);
+  
+  currentCanvasButton.position(550, 50);
+  
+  applyButton.position(550, 400);
+  
+   // Create number input elements with initial values
+  input1 = createInput('33', 'number').attribute('min', 0).attribute('max', 100).position(670, 120);
+  input2 = createInput('33', 'number').attribute('min', 0).attribute('max', 100).position(670, 220);
+  input3 = createInput('34', 'number').attribute('min', 0).attribute('max', 100).position(670, 320);
+  
+   // Create a warning message element
+  warningMessage = createP('Percentages must sum up to 100!').style('color', 'red').position(550, -10);
+  warningMessage.hide(); // Hide it initially
+  
+  input1.input(validateSum);
+  input2.input(validateSum);
+  input3.input(validateSum);
+  
+  percentageValues = getInputValues(); //Get initial values (May be redundant)
+  
+  // Define our colors
+  green1 = color(120, 255, 0, 255); // Background base green
+  green2 = color(200, 255, 0); // Grass blade lighter green
+  green3 = color(170, 255, 30); // Dark shade darker green
+
+  autumnBase = color(194, 120, 56);    // Orangey-brown for the base color
+  autumnLight = color(224, 164, 107);  // Lighter pale brown
+  autumnDark = color(156, 97, 48);     // Darker brown
+
+  snowyBase = color(200, 225, 255);    // Bright light blue, almost white
+  snowyLight = color(230, 240, 255);   // Even lighter pale blue
+  snowyDark = color(170, 200, 230);    // Darker light blue
+  
+  currentColorBG = green1; // Assign default color
+  currentColorGB = green2;
+  currentColorGS = green3;
+
+  // Assign functions to the buttons
+  button.mousePressed(() => {
+    drawGrass(); // Draw the grass
+    usedPositions = []; // Reset used positions value
+  });
+  
+  recColor1Button.mousePressed(() => setColor(green1, green2, green3));
+  recColor2Button.mousePressed(() => setColor(autumnBase, autumnLight, autumnDark));
+  recColor3Button.mousePressed(() => setColor(snowyBase, snowyLight, snowyDark));
+  
+  buttonDownload.mousePressed(() => {
+    saveCanvas(displayCanvas, "grass_image", "png");
+  });
+  
+  buttonDownload1.mousePressed(() => {
+    if (savedGrass1) {
+      save(savedGrass1, 'grass_image_1.png');
+    } else {
+      console.log('No image saved for Grass 1 yet');
+    }
+  });
+
+  buttonDownload2.mousePressed(() => {
+    if (savedGrass2) {
+      save(savedGrass2, 'grass_image_2.png');
+    } else {
+      console.log('No image saved for Grass 2 yet');
+    }
+  });
+
+  buttonDownload3.mousePressed(() => {
+    if (savedGrass3) {
+      save(savedGrass3, 'grass_image_3.png');
+    } else {
+      console.log('No image saved for Grass 3 yet');
+    }
+  });
+  
+  //Save button functionalities
+  saveButton1.mousePressed(() => savedTile());
+  saveButton2.mousePressed(() => savedTile2());
+  saveButton3.mousePressed(() => savedTile3());
+  
+  buttonDownload2.mousePressed(() => {
+    
+  });
+  //Create a color picker
+  colorPicker1 = createColorPicker(green1);
+  colorPicker1.position(0,170);
+  colorPicker2 = createColorPicker(green2);
+  colorPicker2.position(60,170);
+  colorPicker3 = createColorPicker(green3); 
+  colorPicker3.position(120,170);
+  
+    // Add event listeners for each color picker
+  colorPicker1.input(() => updateColor('bg'));
+  colorPicker2.input(() => updateColor('gb'));
+  colorPicker3.input(() => updateColor('gs'));
+  
+  button64.mousePressed(() => {
+    sizeX = 64;
+    sizeY = 64; 
+    bladeSize = (1/16) * sizeX;
+    using64 = true;
+    using32 = false;
+    using16 = false;
+    using8 = false;
+    resizeCanvas(sizeX, sizeY);
+  });
+  button32.mousePressed(() => {
+    sizeX = 32;
+    sizeY = 32;  
+    bladeSize = (1/16) * sizeX;
+    using64 = false;
+    using32 = true;
+    using16 = false;
+     using8 = false;
+    resizeCanvas(sizeX, sizeY);
+  });
+  button16.mousePressed(() => {
+    sizeX = 16;
+    sizeY = 16; 
+    bladeSize = (1/16) * sizeX;
+    using64 = false;
+    using32 = false;
+    using16 = true;
+    using8 = false;
+    resizeCanvas(sizeX, sizeY);
+  });
+  button8.mousePressed(() => {
+    sizeX = 8;
+    sizeY = 8; 
+    bladeSize = (1/16) * sizeX;
+    using64 = false;
+    using32 = false;
+    using16 = false;
+    using8 = true;
+    resizeCanvas(sizeX, sizeY);
+  });
+  
+  applyButton.mousePressed(() => {
+    if(!usingCurrentCanvas){
+      if(!invalidPercentage){
+        customTile();
+      }
+    }
+  });
+  // Initialize usedPositions variable
+  overlapCheck(50, 50);
+  
+  
+  //Initial setup
+  drawGrass();
+  savedTile();
+  savedTile2();
+  savedTile3();
+  
+}
+
+function drawGrass() {
+  background(currentColorBG); // Reset the background when drawing grass
+  for (var i = 0; i < count; i++) {
+    selectGrassBladeType();
+  }
+ 
+  createGrassTiles();//CREATE THE TILESET ON THE BOTTOM OF THE SCREEN
+  createPlayer();
+}
+
+function singleBlockGrassDetail() {
+  //Create a single 1x1 grass block
+  fill(currentColorGB);
+  noStroke();
+  square(xLoc, yLoc, bladeSize);
+  usedPositions.push({ x: xLoc, y: yLoc }); // Add this pixel to used positions
+  singleBlockShade();
+}
+
+function singleBlockShade(){
+  //Create a single 1x1 grass block of a darker color
+  fill(currentColorGS);
+  noStroke();
+  square(xLoc, yLoc + bladeSize, bladeSize);
+  usedPositions.push({ x: xLoc, y: yLoc }); // Add this pixel to used positions
+}
+function rectangleGrassDetail() {
+  //Create a rectangular grass blade
+  fill(currentColorGB);
+  noStroke();
+  rect(xLoc, yLoc, bladeSize, bladeSize * 2);
+  usedPositions.push({ x: xLoc, y: yLoc }); // Bottom part 
+  usedPositions.push({ x: xLoc, y: yLoc + bladeSize }); // Middle part
+  usedPositions.push({ x: xLoc, y: yLoc + bladeSize * 2 }); // Top part 
+  rectangleGrassShade();
+}
+function rectangleGrassShade() {
+  //Create a single square grass shader for the rectangular grass blade
+  fill(currentColorGS);
+  noStroke();
+  square(xLoc, yLoc + (bladeSize * 2), bladeSize);
+  usedPositions.push({ x: xLoc, y: yLoc + (bladeSize * 2)}); // Add this pixel to used positions
+  
+}
+
+function tallDiagonalGrassDetail(){
+  //Create a rectangle grass blade with a diagonal single block grass tip
+  fill(currentColorGB);
+  noStroke();
+  rect(xLoc, yLoc, bladeSize, bladeSize * 2);
+  square(xLoc + bladeSize, yLoc - bladeSize, bladeSize);
+  // Add the positions occupied by the rectangular part to usedPositions
+  usedPositions.push({ x: xLoc, y: yLoc }); // Bottom part 
+  usedPositions.push({ x: xLoc, y: yLoc + bladeSize }); // Middle part
+  usedPositions.push({ x: xLoc, y: yLoc + bladeSize * 2 }); // Top part 
+  usedPositions.push({ x: xLoc + bladeSize, y: yLoc - bladeSize }); // Diagonal tip
+  rectangleGrassShade();
+}
+
+function flower(){
+  //Create a flower, an arrangement 
+  fill(225, 0, 10);
+  noStroke();
+  square(xLoc, yLoc, bladeSize); //Left Petal
+  push();
+  fill(255, 255, 0);
+  square(xLoc + bladeSize, yLoc, bladeSize); //Middle Yellow Piece
+  pop();
+  square(xLoc + bladeSize + bladeSize, yLoc, bladeSize); //Right petal
+  square(xLoc + bladeSize, yLoc + bladeSize, bladeSize); //Bottom Petal
+  square(xLoc + bladeSize, yLoc - bladeSize, bladeSize); //Top petal
+  
+  //FLOWER SHADING
+  fill(currentColorGS);
+  square(xLoc, yLoc + bladeSize, bladeSize); //Left Petal
+  square(xLoc + bladeSize + bladeSize, yLoc + bladeSize, bladeSize); //Right petal
+  square(xLoc + bladeSize, yLoc + bladeSize + bladeSize, bladeSize); //Bottom Petal
+  
+  // Add the positions occupied by the rectangular part to usedPositions
+  usedPositions.push({ x: xLoc, y: yLoc }); //
+  usedPositions.push({x: xLoc + bladeSize, y:yLoc }); //
+  usedPositions.push({x: xLoc + bladeSize + bladeSize, y:yLoc }); //
+  usedPositions.push({x: xLoc + bladeSize, y:yLoc + bladeSize }); //
+  usedPositions.push({x: xLoc + bladeSize, y:yLoc - bladeSize }); //
+  usedPositions.push({x: xLoc, y:yLoc + bladeSize })
+  usedPositions.push({x: xLoc + bladeSize + bladeSize, y:yLoc + bladeSize });
+  usedPositions.push({x: xLoc + bladeSize, y:yLoc + bladeSize + bladeSize});
+}
+
+function randomizeLocation(objWidth, objHeight) {
+  var attempts = 0;
+  var maxAttempts = 100; // Adjust this based on the size of your canvas and grid
+  var yOffset = objHeight; // Ensure there is at least a gap equal to the object's height from the top
+
+  do {
+    // Generate a random x-position for the object, ensuring it stays onscreen and aligns with the grid defined by bladeSize.
+    xLoc = floor(random(0, (sizeX - objWidth) / bladeSize)) * bladeSize; 
+    // Adjust the yLoc to ensure there's enough space above for the object's height.
+    // Do the same for y-position
+    yLoc = floor(random(yOffset / bladeSize, (sizeY - objHeight) / bladeSize)) * bladeSize;
+
+    attempts++;
+
+    // If the number of attempts exceeds maxAttempts, stop the loop and exit
+    if (attempts > maxAttempts) {
+      console.log("No more space to place new objects.");
+      return; // Exit the function
+    }
+
+  } while (overlapCheck(xLoc, yLoc, objWidth, objHeight));
+
+  // Store used positions to prevent overlap. Store the object's size to ensure proper checks.
+  usedPositions.push({ x: xLoc, y: yLoc, width: objWidth, height: objHeight });
+}
+
+function selectGrassBladeType() {
+  var rng = floor(random(1, 5)); // Generates a random number, 1-4.
+  if (rng === 1) {
+    randomizeLocation(bladeSize, bladeSize * 2);
+    singleBlockGrassDetail();
+  } else if(rng === 2) {
+    randomizeLocation(bladeSize, bladeSize * 3);
+    rectangleGrassDetail();
+  } else if(rng == 3){
+    randomizeLocation(bladeSize * 2, bladeSize * 4);
+    tallDiagonalGrassDetail();
+  }else{
+    randomizeLocation(bladeSize * 3, bladeSize * 4);
+    flower();
+  }
+}
+
+function overlapCheck(x, y) {
+  // Define the buffer size 
+  var buffer = bladeSize;
+
+  // Checks if any generated shapes overlap or are within the buffer area of the current shape we're trying to generate
+  for (var i = 0; i < usedPositions.length; i++) {
+    var current = usedPositions[i];
+
+    if (
+      x < current.x + bladeSize + buffer &&
+      x + bladeSize > current.x - buffer &&
+      y < current.y + bladeSize + buffer &&
+      y + bladeSize > current.y - buffer
+    ) {
+      return true; // Overlap or within buffer area
+    }
+  }
+  return false; // No overlap found
+}
+
+function setColor(c1, c2, c3){
+  currentColorBG = c1;
+  currentColorGB = c2;
+  currentColorGS = c3;
+  
+  // Convert p5 color objects to hex strings before assigning them to color pickers
+  colorPicker1.value(c1.toString('#rrggbb'));
+  colorPicker2.value(c2.toString('#rrggbb'));
+  colorPicker3.value(c3.toString('#rrggbb'));
+}
+
+function updateColor(type) {
+  if (type === "bg") {
+    currentColorBG = color(colorPicker1.value());
+  } else if (type === "gb") {
+    currentColorGB = color(colorPicker2.value());
+  } else if (type === "gs") {
+    currentColorGS = color(colorPicker3.value());
+  }
+}
+
+function createGrassTiles() {
+  if (usingCurrentCanvas) {
+    // Clear any previous elements in case the button is clicked multiple times
+    rowCount = 0;
+    yOffset = 150;
+    grassImageElements.forEach((element) => element.remove());
+    grassImageElements = []; // Reset the array
+    grassImage = get(0, 0, sizeX, sizeY); // Store the canvas in the image variable
+    dataUrl = grassImage.canvas.toDataURL(); // Convert to data URL for reuse
+
+    if (using64) {
+      for (let i = 0; i < 16; i++) {
+        let imgElement = createImg(dataUrl, ''); // Create a new image element
+        if (rowCount % 4 == 0) {
+          rowCount = 0;
+          yOffset += 64;
+        }
+        imgElement.position(rowCount * sizeX, 64 + yOffset); // Adjust the position as needed
+        imgElement.size(sizeX, sizeY); // Set the size of the image element
+        imgElement.show(); // Show the image element
+        grassImageElements.push(imgElement); // Store it in the array for future use
+        rowCount += 1;
+      }
+    }
+    if (using32) {
+      for (let i = 0; i < 64; i++) {
+        let imgElement = createImg(dataUrl, ''); // Create a new image element
+        if (rowCount % 8 == 0) {
+          rowCount = 0;
+          yOffset += 32;
+        }
+        imgElement.position(rowCount * sizeX, sizeY + 64 + yOffset); // Adjust the position as needed
+        imgElement.size(sizeX, sizeY); // Set the size of the image element
+        imgElement.show(); // Show the image element
+        grassImageElements.push(imgElement); // Store it in the array for future use
+        rowCount += 1;
+      }
+    }
+    if (using16) {
+      for (let i = 0; i < 256; i++) {
+        let imgElement = createImg(dataUrl, ''); // Create a new image element
+        if (rowCount % 16 == 0) {
+          rowCount = 0;
+          yOffset += 16;
+        }
+        imgElement.position(rowCount * sizeX, sizeY + sizeY + sizeY + 64 + yOffset); // Adjust the position as needed
+        imgElement.size(sizeX, sizeY); // Set the size of the image element
+        imgElement.show(); // Show the image element
+        grassImageElements.push(imgElement); // Store it in the array for future use
+        rowCount += 1;
+      }
+    }
+    if (using8) {
+      for (let i = 0; i < 1024; i++) {
+        let imgElement = createImg(dataUrl, ''); // Create a new image element
+        if (rowCount % 32 == 0) {
+          rowCount = 0;
+          yOffset += 8;
+        }
+        imgElement.position(rowCount * sizeX, sizeY + sizeY + sizeY + sizeY + sizeY + sizeY + sizeY + 64 + yOffset); // Adjust the position as needed
+        imgElement.size(sizeX, sizeY); // Set the size of the image element
+        imgElement.show(); // Show the image element
+        grassImageElements.push(imgElement); // Store it in the array for future use
+        rowCount += 1;
+      }
+    }
+  }
+}
+
+
+function savedTile(){
+    // Remove the existing saved copy if it exists
+  if (savedCopy1) {
+    savedCopy1.remove(); // Removes the previous image element from the DOM
+  }
+  
+  savedGrass1 = get(0, 0, sizeX, sizeY); // Store the  canvas in the image variable
+  dataUrl1 = savedGrass1.canvas.toDataURL(); // Convert to data URL for reuse
+  
+  savedCopy1 = createImg(dataUrl1, ''); // Create a new image element
+  savedCopy1.position(600, 100); // Adjust the position as needed
+  savedCopy1.size(sizeX, sizeY); // Set the size of the image element
+  savedCopy1.show(); // Show the image element
+  console.log("saved!")
+}
+
+function savedTile2(){
+     // Remove the existing saved copy if it exists
+  if (savedCopy2) {
+    savedCopy2.remove(); // Removes the previous image element from the DOM
+  }
+  
+  savedGrass2 = get(0, 0, sizeX, sizeY); // Store the  canvas in the image variable
+  dataUrl2 = savedGrass2.canvas.toDataURL(); // Convert to data URL for reuse
+  
+  savedCopy2 = createImg(dataUrl2, ''); // Create a new image element
+  savedCopy2.position(600, 200); // Adjust the position as needed
+  savedCopy2.size(sizeX, sizeY); // Set the size of the image element
+  savedCopy2.show(); // Show the image element
+  console.log("saved!")
+}
+
+function savedTile3(){
+     // Remove the existing saved copy if it exists
+  if (savedCopy3) {
+    savedCopy3.remove(); // Removes the previous image element from the DOM
+  }
+  
+  savedGrass3 = get(0, 0, sizeX, sizeY); // Store the  canvas in the image variable
+  dataUrl3 = savedGrass3.canvas.toDataURL(); // Convert to data URL for reuse
+  
+  savedCopy3 = createImg(dataUrl3, ''); // Create a new image element
+  savedCopy3.position(600, 300); // Adjust the position as needed
+  savedCopy3.size(sizeX, sizeY); // Set the size of the image element
+  savedCopy3.show(); // Show the image element
+  console.log("saved!")
+}
+
+function createPlayer(){
+  
+  if (playerElement) {
+    playerElement.remove(); // Remove the existing player
+  }
+  
+  if(using16){
+    // Create the player element using `createImg`
+    playerElement = createImg('Player16x16Gif.gif', 'Player');       
+    //Scale the player sprite
+  }
+  else if(using32){
+    playerElement = createImg('Player32x32Gif.gif', 'Player');       
+  }
+  else if(using64){
+    playerElement = createImg('Player64x64Gif.gif', 'Player');       
+  }
+  if(using8){
+     playerElement = createImg('Player16x16Gif.gif', 'Player');
+  }
+  
+}
+function playerMovement() {
+  let moveX = 0;
+  let moveY = 0;
+
+  // Check for key presses and adjust movement values accordingly
+  if (keyMap[LEFT_ARROW]) {
+    moveX -= playerSpeed; // Move left
+    isFacingRight = false;
+  }
+  if (keyMap[RIGHT_ARROW]) {
+    moveX += playerSpeed; // Move right
+    isFacingRight = true;
+  }
+  if (keyMap[UP_ARROW]) {
+    moveY -= playerSpeed; // Move up
+  }
+  if (keyMap[DOWN_ARROW]) {
+    moveY += playerSpeed; // Move down
+  }
+
+  // Normalize diagonal movement
+  let totalMovement = sqrt(moveX * moveX + moveY * moveY);
+  if (totalMovement > playerSpeed) {
+    moveX = (moveX / totalMovement) * playerSpeed;
+    moveY = (moveY / totalMovement) * playerSpeed;
+  }
+
+  // Update player position
+  playerX += moveX;
+  playerY += moveY;
+  
+   // Clamp positions to prevent movement outside boundaries
+  //Player boundaries change for each size, so I have to do one for each...
+  if(using64){
+    
+  
+  if (playerX >= 196) {
+    playerX = 196;
+    moveX = 0;
+  }
+  if (playerX <= 0) {
+    playerX = 0;
+    moveX = 0;
+  }
+  if (playerY <= 265) {
+    playerY = 265;
+    moveY = 0;
+  }
+  if (playerY >= 480) {
+    playerY = 480;
+    moveY = 0;
+  }
+  }
+  if(using32){
+  if (playerX >= 226) {
+    playerX = 226;
+    moveX = 0;
+  }
+  if (playerX <= 0) {
+    playerX = 0;
+    moveX = 0;
+  }
+  if (playerY <= 275) {
+    playerY = 275;
+    moveY = 0;
+  }
+  if (playerY >= 500) {
+    playerY = 500;
+    moveY = 0;
+  }
+  }
+  if(using16){
+  if (playerX >= 240) {
+    playerX = 240;
+    moveX = 0;
+  }
+  if (playerX <= 0) {
+    playerX = 0;
+    moveX = 0;
+  }
+  if (playerY <= 280) {
+    playerY = 280;
+    moveY = 0;
+  }
+  if (playerY >= 520) {
+    playerY = 520;
+    moveY = 0;
+  }
+  }
+  if(using8){
+  if (playerX >= 240) {
+    playerX = 240;
+    moveX = 0;
+  }
+  if (playerX <= 0) {
+    playerX = 0;
+    moveX = 0;
+  }
+  if (playerY <= 280) {
+    playerY = 280;
+    moveY = 0;
+  }
+  if (playerY >= 520) {
+    playerY = 520;
+    moveY = 0;
+  }
+  }
+}
+
+function keyPressed(){
+  keyMap[keyCode] = true;
+}
+
+function keyReleased(){
+  delete keyMap[keyCode];
+}
+
+function toggleState() {
+  // Flip the toggle state
+  usingCurrentCanvas = !usingCurrentCanvas;
+
+  // Update the button's label based on the state
+  if (usingCurrentCanvas) {
+    currentCanvasButton.html('☑ Use Current Canvas'); // Checkmark to show it's "on"
+    console.log(usingCurrentCanvas);
+  } else {
+    currentCanvasButton.html('☐ Use Custom Canvas'); // Square to show it's "off"
+    console.log(usingCurrentCanvas);
+  }
+}
+
+function validateSum() {
+  // Parse input values, default to 0 if not a number
+  let val1 = parseInt(input1.value()) || 0;
+  let val2 = parseInt(input2.value()) || 0;
+  let val3 = parseInt(input3.value()) || 0;
+
+  let total = val1 + val2 + val3;
+
+  // Display or hide the warning message based on total
+  if (total !== 100) {
+    invalidPercentage = true;
+    warningMessage.show();
+    percentageValues = getInputValues();
+  } else {
+    invalidPercentage = false;
+    warningMessage.hide();
+  }
+}
+
+function getInputValues() {
+  // Get the values as integers
+  let val1 = parseInt(input1.value()) || 0;
+  let val2 = parseInt(input2.value()) || 0;
+  let val3 = parseInt(input3.value()) || 0;
+
+  // Return the values as an array or use them directly
+  return [val1, val2, val3];
+}
+
+function chooseRandomElement() {
+  // Get the input values (assumes they sum to 100)
+  let percentages = getInputValues(); 
+  
+  // Generate a random number between 1 and 100
+  let randomRoll = Math.floor(Math.random() * 100) + 1;
+  let cumulativeSum = 0;
+
+  // Find which percentage range the random number falls into
+  for (let i = 0; i < percentages.length; i++) {
+    cumulativeSum += percentages[i];
+    if (randomRoll <= cumulativeSum) {
+      console.log(`Selected element index: ${i}`);
+      return i; // Return the index of the chosen element
+    }
+  }
+}
+
+function customTile(){
+
+    rowCount = 0;
+    yOffset = 150;
+    grassImageElements.forEach((element) => element.remove());
+    grassImageElements = []; // Reset the array
+    grassImage = get(0, 0, sizeX, sizeY); // Store the canvas in the image variable
+    dataUrl = grassImage.canvas.toDataURL(); // Convert to data URL for reuse
+    let imgElement;
+    
+    if(using64){
+      for (let i = 0; i < 16; i++) {
+        rng = chooseRandomElement();
+        if(rng == 0){
+          imgElement = createImg(dataUrl1, '')
+        }
+        if(rng == 1){
+          imgElement = createImg(dataUrl2, '')
+        }
+        if(rng == 2){
+          imgElement = createImg(dataUrl3, '')
+        }
+        if (rowCount % 4 == 0) {
+          rowCount = 0;
+          yOffset += 64;
+        }
+        
+        imgElement.position(rowCount * sizeX, 64 + yOffset); // Adjust the position as needed
+        imgElement.size(sizeX, sizeY); // Set the size of the image element
+        imgElement.show(); // Show the image element
+        grassImageElements.push(imgElement); // Store it in the array for future use
+        rowCount += 1;
+      }
+    }
+    if(using32){
+      for (let i = 0; i < 64; i++) {
+        rng = chooseRandomElement();
+        if(rng == 0){
+          imgElement = createImg(dataUrl1, '')
+        }
+        if(rng == 1){
+          imgElement = createImg(dataUrl2, '')
+        }
+        if(rng == 2){
+          imgElement = createImg(dataUrl3, '')
+        }
+        if (rowCount % 8 == 0) {
+          rowCount = 0;
+          yOffset += 32;
+        }
+        
+        imgElement.position(rowCount * sizeX, sizeY + 64 + yOffset); // Adjust the position as needed
+        imgElement.size(sizeX, sizeY); // Set the size of the image element
+        imgElement.show(); // Show the image element
+        grassImageElements.push(imgElement); // Store it in the array for future use
+        rowCount += 1;
+    }
+  }if(using16){
+    for (let i = 0; i < 256; i++) {
+        rng = chooseRandomElement();
+        if(rng == 0){
+          imgElement = createImg(dataUrl1, '')
+        }
+        if(rng == 1){
+          imgElement = createImg(dataUrl2, '')
+        }
+        if(rng == 2){
+          imgElement = createImg(dataUrl3, '')
+        }
+        if (rowCount % 16 == 0) {
+          rowCount = 0;
+          yOffset += 16;
+        }
+        
+        imgElement.position(rowCount * sizeX, sizeY + sizeY + sizeY + 64 + yOffset); // Adjust the position as needed
+        imgElement.size(sizeX, sizeY); // Set the size of the image element
+        imgElement.show(); // Show the image element
+        grassImageElements.push(imgElement); // Store it in the array for future use
+        rowCount += 1;
+  }
+  }if(using8){
+    for (let i = 0; i < 1024; i++) {
+        rng = chooseRandomElement();
+        if(rng == 0){
+          imgElement = createImg(dataUrl1, '')
+        }
+        if(rng == 1){
+          imgElement = createImg(dataUrl2, '')
+        }
+        if(rng == 2){
+          imgElement = createImg(dataUrl3, '')
+        }
+        if (rowCount % 32 == 0) {
+          rowCount = 0;
+          yOffset += 8;
+        }
+        
+        imgElement.position(rowCount * sizeX, sizeY + sizeY + sizeY + sizeY + sizeY + sizeY + sizeY + 64 + yOffset); // Adjust the position as needed
+        imgElement.size(sizeX, sizeY); // Set the size of the image element
+        imgElement.show(); // Show the image element
+        grassImageElements.push(imgElement); // Store it in the array for future use
+        rowCount += 1;
+  }
+  
+}
+    createPlayer();
+}
+
+function draw(){
+  playerMovement();
+  playerElement.position(playerX, playerY); // Set the position
+  // Flip sprite depending on movement direction
+  if (!isFacingRight) {
+    playerElement.style('transform', 'scaleX(1)');
+  } else {
+    playerElement.style('transform', 'scaleX(-1)');
+  }
+
+  
+}
