@@ -23,8 +23,11 @@ var usedPositions = []; // List of X positions of grass we've already used.
 let green1, green2, green3;
 let autumnBase, autumnLight, autumnDark;
 let snowyBase, snowyLight, snowyDark;
+let speckGreen, speckAutumn, speckSnowy;
 
 let currentColorBG, currentColorGB, currentColorGS;
+let currentColorSpeckGrass;
+let currentColorPetal, currentColorPistil;
 
 let displayCanvas;
 var grassImage;
@@ -62,6 +65,10 @@ let warningMessage;
 var percentageValues;
 var invalidPercentage = false;
 
+var flowers = true;
+var grassSpecks = true;
+var empty = false;
+
 function preload(){
   //Load all of our sprites
   sprite64 = loadImage("Player64x64Gif.gif");
@@ -97,10 +104,14 @@ function setup() {
   saveButton2 = createButton("Save");
   saveButton3 = createButton("Save");
   
-  currentCanvasButton = createButton('☑ Use Current Canvas');
+  currentCanvasButton = createButton('Using Current Canvas');
   currentCanvasButton.mousePressed(toggleState);
   
   applyButton = createButton("Apply Custom Tiles!")
+  
+  flowersButton = createButton("Flowers? ☑");
+  grassSpeckButton = createButton("Grass Specks? ☑");
+  emptyButton = createButton("Empty? ☐");
   
   button64.position(0, 220);
   button32.position(100, 220);
@@ -120,6 +131,10 @@ function setup() {
   
   applyButton.position(550, 400);
   
+  flowersButton.position(300, 460);
+  grassSpeckButton.position(400, 460);
+  emptyButton.position(535, 460);
+  
    // Create number input elements with initial values
   input1 = createInput('33', 'number').attribute('min', 0).attribute('max', 100).position(670, 120);
   input2 = createInput('33', 'number').attribute('min', 0).attribute('max', 100).position(670, 220);
@@ -135,22 +150,30 @@ function setup() {
   
   percentageValues = getInputValues(); //Get initial values (May be redundant)
   
-  // Define our colors
-  green1 = color(120, 255, 0, 255); // Background base green
-  green2 = color(200, 255, 0); // Grass blade lighter green
-  green3 = color(170, 255, 30); // Dark shade darker green
-
+// Greens for vibrant grass
+  green1 = color(100, 200, 70);    // Base grass green: vibrant and fresh
+  green2 = color(140, 220, 100);   // Lighter green: brighter, almost neon
+  green3 = color(80, 160, 60);     // Darker green for shading: rich and deep
+  speckGreen = color(140, 235, 115); // Grass speck: slightly brighter green for contrast
+  
+// Autumn palette
   autumnBase = color(194, 120, 56);    // Orangey-brown for the base color
   autumnLight = color(224, 164, 107);  // Lighter pale brown
   autumnDark = color(156, 97, 48);     // Darker brown
+  speckAutumn = color(240, 160, 80);   // Slightly darker reddish-brown for grass specks
 
+// Winter palette
   snowyBase = color(200, 225, 255);    // Bright light blue, almost white
   snowyLight = color(230, 240, 255);   // Even lighter pale blue
   snowyDark = color(170, 200, 230);    // Darker light blue
+  speckSnowy = color(255, 255, 255);   // Muted frosty green for grass speck
   
   currentColorBG = green1; // Assign default color
   currentColorGB = green2;
   currentColorGS = green3;
+  currentColorSpeckGrass = speckGreen;
+  currentColorPetal = color(225, 0, 10);
+  currentColorPistil = color(255, 255, 0);
 
   // Assign functions to the buttons
   button.mousePressed(() => {
@@ -158,9 +181,9 @@ function setup() {
     usedPositions = []; // Reset used positions value
   });
   
-  recColor1Button.mousePressed(() => setColor(green1, green2, green3));
-  recColor2Button.mousePressed(() => setColor(autumnBase, autumnLight, autumnDark));
-  recColor3Button.mousePressed(() => setColor(snowyBase, snowyLight, snowyDark));
+  recColor1Button.mousePressed(() => setColor(green1, green2, green3, speckGreen));
+  recColor2Button.mousePressed(() => setColor(autumnBase, autumnLight, autumnDark, speckAutumn));
+  recColor3Button.mousePressed(() => setColor(snowyBase, snowyLight, snowyDark, speckSnowy));
   
   buttonDownload.mousePressed(() => {
     saveCanvas(displayCanvas, "grass_image", "png");
@@ -206,10 +229,21 @@ function setup() {
   colorPicker3 = createColorPicker(green3); 
   colorPicker3.position(120,170);
   
+  colorPickerSpeck = createColorPicker(speckGreen);
+  colorPickerSpeck.position(180, 170);
+  
+  colorPickerPetal = createColorPicker(currentColorPetal);
+  colorPickerPetal.position(240, 170);
+  colorPickerPistil = createColorPicker(currentColorPistil);
+  colorPickerPistil.position(300, 170);
+  
     // Add event listeners for each color picker
   colorPicker1.input(() => updateColor('bg'));
   colorPicker2.input(() => updateColor('gb'));
   colorPicker3.input(() => updateColor('gs'));
+  colorPickerSpeck.input(() => updateColor('sg'));
+  colorPickerPetal.input(() => updateColor('pe'));
+  colorPickerPistil.input(() => updateColor('pi'));
   
   button64.mousePressed(() => {
     sizeX = 64;
@@ -259,6 +293,18 @@ function setup() {
       }
     }
   });
+  
+  flowersButton.mousePressed(() => {
+    toggleFlowers();
+  });
+  
+  grassSpeckButton.mousePressed(() => {
+    toggleGrassSpecks();
+  });
+  
+  emptyButton.mousePressed(() => {
+    toggleEmpty();
+  });
   // Initialize usedPositions variable
   overlapCheck(50, 50);
   
@@ -269,16 +315,34 @@ function setup() {
   savedTile2();
   savedTile3();
   
+  applyButton.hide();
+  buttonDownload1.hide();
+  buttonDownload2.hide();
+  buttonDownload3.hide();
+  saveButton1.hide();
+  saveButton2.hide();
+  saveButton3.hide();
+  input1.hide();
+  input2.hide();
+  input3.hide();
+  savedCopy1.hide();
+  savedCopy2.hide();
+  savedCopy3.hide();
+  
 }
 
 function drawGrass() {
   background(currentColorBG); // Reset the background when drawing grass
-  for (var i = 0; i < count; i++) {
-    selectGrassBladeType();
+  if(!empty){
+    for (var i = 0; i < count; i++) {
+      selectGrassBladeType();
+    }
   }
  
   createGrassTiles();//CREATE THE TILESET ON THE BOTTOM OF THE SCREEN
   createPlayer();
+  
+  
 }
 
 function singleBlockGrassDetail() {
@@ -288,6 +352,14 @@ function singleBlockGrassDetail() {
   square(xLoc, yLoc, bladeSize);
   usedPositions.push({ x: xLoc, y: yLoc }); // Add this pixel to used positions
   singleBlockShade();
+}
+
+function grassSpeck() {
+  //Create a single 1x1 grass block
+  fill(currentColorSpeckGrass);
+  noStroke();
+  square(xLoc, yLoc, bladeSize);
+  usedPositions.push({ x: xLoc, y: yLoc }); // Add this pixel to used positions
 }
 
 function singleBlockShade(){
@@ -332,11 +404,11 @@ function tallDiagonalGrassDetail(){
 
 function flower(){
   //Create a flower, an arrangement 
-  fill(225, 0, 10);
+  fill(currentColorPetal);
   noStroke();
   square(xLoc, yLoc, bladeSize); //Left Petal
   push();
-  fill(255, 255, 0);
+  fill(currentColorPistil);
   square(xLoc + bladeSize, yLoc, bladeSize); //Middle Yellow Piece
   pop();
   square(xLoc + bladeSize + bladeSize, yLoc, bladeSize); //Right petal
@@ -387,19 +459,37 @@ function randomizeLocation(objWidth, objHeight) {
 }
 
 function selectGrassBladeType() {
-  var rng = floor(random(1, 5)); // Generates a random number, 1-4.
-  if (rng === 1) {
-    randomizeLocation(bladeSize, bladeSize * 2);
-    singleBlockGrassDetail();
-  } else if(rng === 2) {
-    randomizeLocation(bladeSize, bladeSize * 3);
-    rectangleGrassDetail();
-  } else if(rng == 3){
-    randomizeLocation(bladeSize * 2, bladeSize * 4);
-    tallDiagonalGrassDetail();
-  }else{
-    randomizeLocation(bladeSize * 3, bladeSize * 4);
-    flower();
+  let valid = false; // Flag to determine if a valid type is found
+  
+  while (!valid) {
+    let rng = floor(random(1, 6)); // Generates a random number, 1 to 5.
+
+    if (rng === 1) {
+      randomizeLocation(bladeSize, bladeSize * 2);
+      singleBlockGrassDetail();
+      valid = true; // Valid result found
+    } else if (rng === 2) {
+      randomizeLocation(bladeSize, bladeSize * 3);
+      rectangleGrassDetail();
+      valid = true; // Valid result found
+    } else if (rng === 3) {
+      randomizeLocation(bladeSize * 2, bladeSize * 4);
+      tallDiagonalGrassDetail();
+      valid = true; // Valid result found
+    } else if (rng === 4) {
+      if (flowers) {
+        randomizeLocation(bladeSize * 3, bladeSize * 4);
+        flower();
+        valid = true; // Valid result found
+      }
+      // If flowers are not enabled, it will simply reroll
+    } else if (rng === 5) { 
+      if (grassSpecks) { 
+        randomizeLocation(bladeSize, bladeSize); // Ensure you're passing valid arguments
+        grassSpeck();
+        valid = true; // Valid result found
+      }
+    }
   }
 }
 
@@ -423,15 +513,17 @@ function overlapCheck(x, y) {
   return false; // No overlap found
 }
 
-function setColor(c1, c2, c3){
+function setColor(c1, c2, c3, c4){
   currentColorBG = c1;
   currentColorGB = c2;
   currentColorGS = c3;
+  currentColorSpeckGrass = c4;
   
   // Convert p5 color objects to hex strings before assigning them to color pickers
   colorPicker1.value(c1.toString('#rrggbb'));
   colorPicker2.value(c2.toString('#rrggbb'));
   colorPicker3.value(c3.toString('#rrggbb'));
+  colorPickerSpeck.value(c4.toString('#rrggbb'));
 }
 
 function updateColor(type) {
@@ -441,7 +533,14 @@ function updateColor(type) {
     currentColorGB = color(colorPicker2.value());
   } else if (type === "gs") {
     currentColorGS = color(colorPicker3.value());
+  } else if (type === "sg"){
+    currentColorSpeckGrass = color(colorPickerSpeck.value());
+  } else if (type === "pe"){
+    currentColorPetal = color(colorPickerPetal.value());
+  } else if (type === "pi"){
+    currentColorPistil = color(colorPickerPistil.value());
   }
+  
 }
 
 function createGrassTiles() {
@@ -707,11 +806,76 @@ function toggleState() {
 
   // Update the button's label based on the state
   if (usingCurrentCanvas) {
-    currentCanvasButton.html('☑ Use Current Canvas'); // Checkmark to show it's "on"
-    console.log(usingCurrentCanvas);
+    currentCanvasButton.html('Using Current Canvas'); 
+    applyButton.hide();
+    buttonDownload1.hide();
+    buttonDownload2.hide();
+    buttonDownload3.hide();
+    saveButton1.hide();
+    saveButton2.hide();
+    saveButton3.hide();
+    input1.hide();
+    input2.hide();
+    input3.hide();
+    savedCopy1.hide();
+    savedCopy2.hide();
+    savedCopy3.hide();
+    
   } else {
-    currentCanvasButton.html('☐ Use Custom Canvas'); // Square to show it's "off"
-    console.log(usingCurrentCanvas);
+    currentCanvasButton.html('Using Custom Canvas'); 
+    applyButton.show();
+    buttonDownload1.show();
+    buttonDownload2.show();
+    buttonDownload3.show();
+    saveButton1.show();
+    saveButton2.show();
+    saveButton3.show();
+    input1.show();
+    input2.show();
+    input3.show();
+    savedCopy1.show();
+    savedCopy2.show();
+    savedCopy3.show();
+    
+  }
+}
+
+function toggleFlowers(){
+  if(!empty){
+    flowers = !flowers;
+    if(flowers){
+      flowersButton.html("Flowers? ☑");
+    }else{
+      flowersButton.html("Flowers? ☐")
+    }
+  }
+  
+}
+
+function toggleGrassSpecks(){
+  if(!empty){
+    grassSpecks = !grassSpecks;
+    if(grassSpecks){
+      grassSpeckButton.html("Grass Specks? ☑");
+    }else{
+      grassSpeckButton.html("Grass Specks? ☐")
+    }
+  }
+  
+}
+
+function toggleEmpty(){
+  empty = !empty;
+  
+  if(empty){
+    emptyButton.html("Empty? ☑");
+    flowersButton.html("Flowers? ☐");
+    grassSpeckButton.html("Grass Specks? ☐");
+    flowers = false;
+    grassSpecks = false;
+    
+  }else{
+    emptyButton.html("Empty? ☐")
   }
 }
 
