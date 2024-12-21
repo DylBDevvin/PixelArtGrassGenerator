@@ -1,25 +1,53 @@
 <!DOCTYPE html>
-<html lang="">
-
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>p5.js example</title>
-  <style>
-    body {
-      padding: 0;
-      margin: 0;
-      background-color: #1b1b1b;
-    }
-  </style>
-  <script src="../p5.min.js"></script>
-  <!-- <script src="../addons/p5.sound.js"></script> -->
-  <script src="sketch.js"></script>
-</head>
-
-<body>
-  <main>
-  </main>
-</body>
-
+<html lang="en">
+  <head>
+    <link href="https://fonts.googleapis.com/css?family=Press Start 2P" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.10.0/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.10.0/addons/p5.sound.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="utf-8" />
+    <style>
+      body{
+        all: unset;
+        display: inline-block;
+        font-family: "Press Start 2P", monospace;
+        font-size: 12px;
+        color: #00ff00;
+        background: #000;
+            
+        h1, h2, h3 {
+        font-family: "Press Start 2P", monospace;
+        text-shadow: 0 0 0px #00ff00, 0 0 0px #00ff00;
+        }
+      }
+      button{
+        
+        font-family: "Press Start 2P", monospace;
+        font-size: 10px;
+        color: #00ff00;
+        background: #000;
+        border: 2px solid #00ff00;
+        border-radius: 5px;
+        padding: 10px 20px;
+        text-shadow: 0 0 0px #00ff00, 0 0 0px #00ff00;
+        transition: transform 0.2s, background-color 0.3s, color 0.3s;
+        
+      }
+      button:hover{
+        background-color: #00ff00;
+        color: #000;
+        transform: scale(1.1);
+      }
+      
+      button:active{
+        transform: scale(1.0f);
+        box-shadow: 0 0 15px #00ff00;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+    </main>
+    <script src="sketch.js"></script>
+  </body>
 </html>
