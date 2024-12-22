@@ -85,11 +85,11 @@ function setup() {
   button.position(xOffset, 100);
   
   recColor1Button = createButton("Standard Color");
-  recColor1Button.position(xOffset, 130);
+  recColor1Button.position(800 + xOffset, 400);
   recColor2Button = createButton("Autumn Color");
-  recColor2Button.position(120 + xOffset, 130);
+  recColor2Button.position(1010 + xOffset, 400);
   recColor3Button = createButton("Winter Color");
-  recColor3Button.position(240 + xOffset, 130);
+  recColor3Button.position(1200 + xOffset, 400);
   
   button64 = createButton("Size: 64x64");
   button32 = createButton("Size: 32x32");
@@ -114,12 +114,12 @@ function setup() {
   grassSpeckButton = createButton("Grass Specks? ☑");
   emptyButton = createButton("Empty? ☐");
   
-  button64.position(270 + xOffset, 580); 
-  button32.position(450 + xOffset, 580);
-  button16.position(630 + xOffset, 580);
-  button8.position(810 + xOffset, 580);
+  button64.position(830 + xOffset, 100); 
+  button32.position(830 + xOffset, 160);
+  button16.position(830 + xOffset, 220);
+  button8.position(830 + xOffset, 280);
   
-  buttonDownload.position(0 + xOffset, 120);
+  buttonDownload.position(0 + xOffset, 160);
   buttonDownload1.position(500 + xOffset, 145);
   buttonDownload2.position(500 + xOffset, 245);
   buttonDownload3.position(500 + xOffset, 345);
@@ -133,9 +133,10 @@ function setup() {
   applyButton.position(550 + xOffset, 400);
   
  // Adjust Flowers, Grass Specks, and Empty buttons
-  flowersButton.position(270 + xOffset, 400); // Align with Size: 64 button (x position)
-  grassSpeckButton.position(270 + xOffset, 460); // Below Flowers button
-  emptyButton.position(270 + xOffset, 520); // Below Grass Specks button
+  flowersButton.position(270 + xOffset, 460); // Align with Size: 64 button (x position)
+  grassSpeckButton.position(270 + xOffset, 520); // Below Flowers button
+  emptyButton.position(270 + xOffset, 580); // Below Grass Specks button
+
 
    // Create number input elements with initial values
   input1 = createInput('33', 'number').attribute('min', 0).attribute('max', 100).position(670, 120);
@@ -176,6 +177,22 @@ function setup() {
   currentColorSpeckGrass = speckGreen;
   currentColorPetal = color(225, 0, 10);
   currentColorPistil = color(255, 255, 0);
+
+    //Create a color picker
+    colorPicker1 = createColorPicker(green1);
+    colorPicker1.position(540 + xOffset, 400);
+    colorPicker2 = createColorPicker(green2);
+    colorPicker2.position(600 + xOffset, 400);
+    colorPicker3 = createColorPicker(green3); 
+    colorPicker3.position(660 + xOffset, 400);
+    
+    colorPickerSpeck = createColorPicker(speckGreen);
+    colorPickerSpeck.position(540 + xOffset, 520);
+    
+    colorPickerPetal = createColorPicker(currentColorPetal);
+    colorPickerPetal.position(540 + xOffset, 460);
+    colorPickerPistil = createColorPicker(currentColorPistil);
+    colorPickerPistil.position(600 + xOffset, 460);
 
   // Assign functions to the buttons
   button.mousePressed(() => {
@@ -223,21 +240,7 @@ function setup() {
   buttonDownload2.mousePressed(() => {
     
   });
-  //Create a color picker
-  colorPicker1 = createColorPicker(green1);
-  colorPicker1.position(0 + xOffset,170);
-  colorPicker2 = createColorPicker(green2);
-  colorPicker2.position(60 + xOffset,170);
-  colorPicker3 = createColorPicker(green3); 
-  colorPicker3.position(120 + xOffset,170);
   
-  colorPickerSpeck = createColorPicker(speckGreen);
-  colorPickerSpeck.position(180 + xOffset, 170);
-  
-  colorPickerPetal = createColorPicker(currentColorPetal);
-  colorPickerPetal.position(240 + xOffset, 170);
-  colorPickerPistil = createColorPicker(currentColorPistil);
-  colorPickerPistil.position(300 + xOffset, 170);
   
     // Add event listeners for each color picker
   colorPicker1.input(() => updateColor('bg'));
