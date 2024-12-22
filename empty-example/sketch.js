@@ -68,6 +68,7 @@ var invalidPercentage = false;
 var flowers = true;
 var grassSpecks = true;
 var empty = false;
+var xOffset = 20;
 
 function preload(){
   //Load all of our sprites
@@ -79,16 +80,16 @@ function preload(){
 function setup() {
   
   displayCanvas = createCanvas(sizeX, sizeY);
-  displayCanvas.position = (0,0);
+  displayCanvas.position(xOffset, 20);
   button = createButton("Generate Grass!");
-  button.position(0, 80);
+  button.position(xOffset, 100);
   
   recColor1Button = createButton("Standard Color");
-  recColor1Button.position(0, 130);
+  recColor1Button.position(xOffset, 130);
   recColor2Button = createButton("Autumn Color");
-  recColor2Button.position(120, 130);
+  recColor2Button.position(120 + xOffset, 130);
   recColor3Button = createButton("Winter Color");
-  recColor3Button.position(240, 130);
+  recColor3Button.position(240 + xOffset, 130);
   
   button64 = createButton("Size: 64x64");
   button32 = createButton("Size: 32x32");
@@ -113,28 +114,29 @@ function setup() {
   grassSpeckButton = createButton("Grass Specks? ☑");
   emptyButton = createButton("Empty? ☐");
   
-  button64.position(0, 220);
-  button32.position(100, 220);
-  button16.position(200, 220);
-  button8.position(300, 220);
+  button64.position(270 + xOffset, 580); 
+  button32.position(450 + xOffset, 580);
+  button16.position(630 + xOffset, 580);
+  button8.position(810 + xOffset, 580);
   
-  buttonDownload.position(0, 250);
-  buttonDownload1.position(500, 145);
-  buttonDownload2.position(500, 245);
-  buttonDownload3.position(500, 345);
+  buttonDownload.position(0 + xOffset, 120);
+  buttonDownload1.position(500 + xOffset, 145);
+  buttonDownload2.position(500 + xOffset, 245);
+  buttonDownload3.position(500 + xOffset, 345);
   
-  saveButton1.position(500, 120);
-  saveButton2.position(500, 220);
-  saveButton3.position(500, 320);
+  saveButton1.position(500 + xOffset, 120);
+  saveButton2.position(500 + xOffset, 220);
+  saveButton3.position(500 + xOffset, 320);
   
-  currentCanvasButton.position(550, 50);
+  currentCanvasButton.position(550 + xOffset, 50);
   
-  applyButton.position(550, 400);
+  applyButton.position(550 + xOffset, 400);
   
-  flowersButton.position(300, 460);
-  grassSpeckButton.position(400, 460);
-  emptyButton.position(535, 460);
-  
+ // Adjust Flowers, Grass Specks, and Empty buttons
+  flowersButton.position(270 + xOffset, 400); // Align with Size: 64 button (x position)
+  grassSpeckButton.position(270 + xOffset, 460); // Below Flowers button
+  emptyButton.position(270 + xOffset, 520); // Below Grass Specks button
+
    // Create number input elements with initial values
   input1 = createInput('33', 'number').attribute('min', 0).attribute('max', 100).position(670, 120);
   input2 = createInput('33', 'number').attribute('min', 0).attribute('max', 100).position(670, 220);
@@ -223,19 +225,19 @@ function setup() {
   });
   //Create a color picker
   colorPicker1 = createColorPicker(green1);
-  colorPicker1.position(0,170);
+  colorPicker1.position(0 + xOffset,170);
   colorPicker2 = createColorPicker(green2);
-  colorPicker2.position(60,170);
+  colorPicker2.position(60 + xOffset,170);
   colorPicker3 = createColorPicker(green3); 
-  colorPicker3.position(120,170);
+  colorPicker3.position(120 + xOffset,170);
   
   colorPickerSpeck = createColorPicker(speckGreen);
-  colorPickerSpeck.position(180, 170);
+  colorPickerSpeck.position(180 + xOffset, 170);
   
   colorPickerPetal = createColorPicker(currentColorPetal);
-  colorPickerPetal.position(240, 170);
+  colorPickerPetal.position(240 + xOffset, 170);
   colorPickerPistil = createColorPicker(currentColorPistil);
-  colorPickerPistil.position(300, 170);
+  colorPickerPistil.position(300 + xOffset, 170);
   
     // Add event listeners for each color picker
   colorPicker1.input(() => updateColor('bg'));
@@ -547,7 +549,8 @@ function createGrassTiles() {
   if (usingCurrentCanvas) {
     // Clear any previous elements in case the button is clicked multiple times
     rowCount = 0;
-    yOffset = 150;
+    yOffset = 250;
+    xOffset = 20;
     grassImageElements.forEach((element) => element.remove());
     grassImageElements = []; // Reset the array
     grassImage = get(0, 0, sizeX, sizeY); // Store the canvas in the image variable
@@ -560,7 +563,7 @@ function createGrassTiles() {
           rowCount = 0;
           yOffset += 64;
         }
-        imgElement.position(rowCount * sizeX, 64 + yOffset); // Adjust the position as needed
+        imgElement.position(xOffset + rowCount * sizeX, 64 + yOffset); // Adjust the position as needed
         imgElement.size(sizeX, sizeY); // Set the size of the image element
         imgElement.show(); // Show the image element
         grassImageElements.push(imgElement); // Store it in the array for future use
@@ -574,7 +577,7 @@ function createGrassTiles() {
           rowCount = 0;
           yOffset += 32;
         }
-        imgElement.position(rowCount * sizeX, sizeY + 64 + yOffset); // Adjust the position as needed
+        imgElement.position(xOffset + rowCount * sizeX, sizeY + 64 + yOffset); // Adjust the position as needed
         imgElement.size(sizeX, sizeY); // Set the size of the image element
         imgElement.show(); // Show the image element
         grassImageElements.push(imgElement); // Store it in the array for future use
@@ -588,7 +591,7 @@ function createGrassTiles() {
           rowCount = 0;
           yOffset += 16;
         }
-        imgElement.position(rowCount * sizeX, sizeY + sizeY + sizeY + 64 + yOffset); // Adjust the position as needed
+        imgElement.position(xOffset + rowCount * sizeX, sizeY + sizeY + sizeY + 64 + yOffset); // Adjust the position as needed
         imgElement.size(sizeX, sizeY); // Set the size of the image element
         imgElement.show(); // Show the image element
         grassImageElements.push(imgElement); // Store it in the array for future use
@@ -602,7 +605,7 @@ function createGrassTiles() {
           rowCount = 0;
           yOffset += 8;
         }
-        imgElement.position(rowCount * sizeX, sizeY + sizeY + sizeY + sizeY + sizeY + sizeY + sizeY + 64 + yOffset); // Adjust the position as needed
+        imgElement.position(xOffset+ rowCount * sizeX, sizeY + sizeY + sizeY + sizeY + sizeY + sizeY + sizeY + 64 + yOffset); // Adjust the position as needed
         imgElement.size(sizeX, sizeY); // Set the size of the image element
         imgElement.show(); // Show the image element
         grassImageElements.push(imgElement); // Store it in the array for future use
@@ -927,7 +930,6 @@ function chooseRandomElement() {
 }
 
 function customTile(){
-
     rowCount = 0;
     yOffset = 150;
     grassImageElements.forEach((element) => element.remove());
