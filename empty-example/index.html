@@ -33,6 +33,14 @@
         transition: transform 0.2s, background-color 0.3s, color 0.3s;
         
       }
+      input[type = "color"]{
+        background-color: #202227;
+        border-radius: 5px;
+      }
+
+      input[type = "color"]:hover{
+        background-color: #17181C;
+      }
       button:hover{
         background-color: #000;
         color: #f696fd;
@@ -43,10 +51,40 @@
         transform: scale(1.0f);
         box-shadow: 0 0 15px #8da4cc;
       }
+
+      .fake-button {
+        display: inline-block;
+        font-family: "Press Start 2P", monospace;
+        font-size: 10px;
+        color: #f696fd;
+        background: #17181C;
+        border: 2px solid #8da4cc;
+        border-radius: 5px;
+        padding: 10px 20px;
+        text-shadow: 0 0 8px #f696fd, 0 0 8px #f696fd;
+        text-align: center; 
+        display: inline-block;
+        text-shadow: 0 0 8px #f696fd, 0 0 8px #f696fd;
+        transition: transform 0.2s, background-color 0.3s, color 0.3s;
+        cursor: not-allowed; /* Ensures the cursor doesn't show the clickable pointer */
+      }
+
+    .fake-button:hover {
+        background-color: #000;
+        color: #f696fd;
+        transform: scale(1.0);
+    }
+
+    .fake-button:active {
+      transform: scale(1.0);
+      box-shadow: 0 0 15px #8da4cc;
+    }
+
     </style>
   </head>
   <body>
     <main>
+      <div id = "fake-button" class = "fake-button">Background/Petal/Shade:</div>
     </main>
     <script src="sketch.js"></script>
   </body>
