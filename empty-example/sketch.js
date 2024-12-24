@@ -69,6 +69,7 @@ var flowers = true;
 var grassSpecks = true;
 var empty = false;
 var xOffset = 20;
+var grassText;
 
 function preload(){
   //Load all of our sprites
@@ -178,13 +179,19 @@ function setup() {
   currentColorPetal = color(225, 0, 10);
   currentColorPistil = color(255, 255, 0);
 
+    //Grass text
+
+
+    grassElement = select('#fake-button');
+    grassElement.position(270 + xOffset, 395);
+    
     //Create a color picker
     colorPicker1 = createColorPicker(green1);
-    colorPicker1.position(540 + xOffset, 400);
+    colorPicker1.position(550 + xOffset, 400);
     colorPicker2 = createColorPicker(green2);
-    colorPicker2.position(600 + xOffset, 400);
+    colorPicker2.position(610 + xOffset, 400);
     colorPicker3 = createColorPicker(green3); 
-    colorPicker3.position(660 + xOffset, 400);
+    colorPicker3.position(670 + xOffset, 400);
     
     colorPickerSpeck = createColorPicker(speckGreen);
     colorPickerSpeck.position(540 + xOffset, 520);
