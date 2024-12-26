@@ -70,6 +70,11 @@ var grassSpecks = true;
 var empty = false;
 var xOffset = 20;
 var grassText;
+var customTileOffset = 500;
+var descriptionLabel;
+var colorLabel;
+var movementLabel;
+var underscoreTag;
 
 function preload(){
   //Load all of our sprites
@@ -115,34 +120,42 @@ function setup() {
   grassSpeckButton = createButton("Grass Specks? ☑");
   emptyButton = createButton("Empty? ☐");
   
-  button64.position(830 + xOffset, 100); 
-  button32.position(830 + xOffset, 160);
-  button16.position(830 + xOffset, 220);
-  button8.position(830 + xOffset, 280);
+  button64.position(0 + xOffset, 240); 
+  button32.position(170 + xOffset, 240);
+  button16.position(0 + xOffset, 280);
+  button8.position(170 + xOffset, 280);
   
   buttonDownload.position(0 + xOffset, 160);
-  buttonDownload1.position(500 + xOffset, 145);
-  buttonDownload2.position(500 + xOffset, 245);
-  buttonDownload3.position(500 + xOffset, 345);
+  buttonDownload1.position(420 + xOffset + customTileOffset, 115);
+  buttonDownload2.position(420 + xOffset + customTileOffset, 215);
+  buttonDownload3.position(420 + xOffset + customTileOffset, 315);
   
-  saveButton1.position(500 + xOffset, 120);
-  saveButton2.position(500 + xOffset, 220);
-  saveButton3.position(500 + xOffset, 320);
+  saveButton1.position(420 + xOffset + customTileOffset, 70);
+  saveButton2.position(420 + xOffset + customTileOffset, 170);
+  saveButton3.position(420 + xOffset + customTileOffset, 270);
   
-  currentCanvasButton.position(550 + xOffset, 50);
+  currentCanvasButton.position(510 + xOffset + customTileOffset, 20);
   
-  applyButton.position(550 + xOffset, 400);
+  applyButton.position(760 + xOffset + customTileOffset, 200);
   
  // Adjust Flowers, Grass Specks, and Empty buttons
   flowersButton.position(270 + xOffset, 460); // Align with Size: 64 button (x position)
   grassSpeckButton.position(270 + xOffset, 520); // Below Flowers button
   emptyButton.position(270 + xOffset, 580); // Below Grass Specks button
 
+  underscoreTag = createP("-------------------------------------------------------------------------------------------");
+  descriptionLabel = createP("Details");
+  colorLabel = createP("Recommended Colors");
+  //movementLabel = createP("Use WASD or Arrow Keys to move!");
+  underscoreTag.position(270 + xOffset, 360);
+  descriptionLabel.position(270 + xOffset, 340);
+  colorLabel.position(800 + xOffset, 340);
+
 
    // Create number input elements with initial values
-  input1 = createInput('33', 'number').attribute('min', 0).attribute('max', 100).position(670, 120);
-  input2 = createInput('33', 'number').attribute('min', 0).attribute('max', 100).position(670, 220);
-  input3 = createInput('34', 'number').attribute('min', 0).attribute('max', 100).position(670, 320);
+  input1 = createInput('33', 'number').attribute('min', 0).attribute('max', 100).position(670 + customTileOffset, 90);
+  input2 = createInput('33', 'number').attribute('min', 0).attribute('max', 100).position(670 + customTileOffset, 190);
+  input3 = createInput('34', 'number').attribute('min', 0).attribute('max', 100).position(670 + customTileOffset, 290);
   
    // Create a warning message element
   warningMessage = createP('Percentages must sum up to 100!').style('color', 'red').position(550, -10);
@@ -194,12 +207,12 @@ function setup() {
     colorPicker3.position(670 + xOffset, 400);
     
     colorPickerSpeck = createColorPicker(speckGreen);
-    colorPickerSpeck.position(540 + xOffset, 520);
+    colorPickerSpeck.position(470 + xOffset, 525);
     
     colorPickerPetal = createColorPicker(currentColorPetal);
-    colorPickerPetal.position(540 + xOffset, 460);
+    colorPickerPetal.position(420 + xOffset, 465);
     colorPickerPistil = createColorPicker(currentColorPistil);
-    colorPickerPistil.position(600 + xOffset, 460);
+    colorPickerPistil.position(480 + xOffset, 465);
 
   // Assign functions to the buttons
   button.mousePressed(() => {
@@ -636,7 +649,7 @@ function savedTile(){
   dataUrl1 = savedGrass1.canvas.toDataURL(); // Convert to data URL for reuse
   
   savedCopy1 = createImg(dataUrl1, ''); // Create a new image element
-  savedCopy1.position(600, 100); // Adjust the position as needed
+  savedCopy1.position(600  + customTileOffset, 70); // Adjust the position as needed
   savedCopy1.size(sizeX, sizeY); // Set the size of the image element
   savedCopy1.show(); // Show the image element
   console.log("saved!")
@@ -652,7 +665,7 @@ function savedTile2(){
   dataUrl2 = savedGrass2.canvas.toDataURL(); // Convert to data URL for reuse
   
   savedCopy2 = createImg(dataUrl2, ''); // Create a new image element
-  savedCopy2.position(600, 200); // Adjust the position as needed
+  savedCopy2.position(600 + customTileOffset, 170); // Adjust the position as needed
   savedCopy2.size(sizeX, sizeY); // Set the size of the image element
   savedCopy2.show(); // Show the image element
   console.log("saved!")
@@ -668,7 +681,7 @@ function savedTile3(){
   dataUrl3 = savedGrass3.canvas.toDataURL(); // Convert to data URL for reuse
   
   savedCopy3 = createImg(dataUrl3, ''); // Create a new image element
-  savedCopy3.position(600, 300); // Adjust the position as needed
+  savedCopy3.position(600 + customTileOffset, 270); // Adjust the position as needed
   savedCopy3.size(sizeX, sizeY); // Set the size of the image element
   savedCopy3.show(); // Show the image element
   console.log("saved!")
