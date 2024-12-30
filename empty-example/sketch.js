@@ -53,8 +53,8 @@ let savedCopy3; //IMAGE ELEMENT FOR THE COPIES (3)
 
 let sprite;
 let playerElement; // Variable to hold the player HTML image element
-var playerX = 40
-var playerY = 333
+var playerX = 60;
+var playerY = 393;
 var playerSpeed = 3;
 var keyMap = {}; // Object to keep track of key states
 var isFacingRight;
@@ -126,9 +126,9 @@ function setup() {
   button8.position(170 + xOffset, 280);
   
   buttonDownload.position(0 + xOffset, 160);
-  buttonDownload1.position(420 + xOffset + customTileOffset, 115);
-  buttonDownload2.position(420 + xOffset + customTileOffset, 215);
-  buttonDownload3.position(420 + xOffset + customTileOffset, 315);
+  buttonDownload1.position(420 + xOffset + customTileOffset, 105);
+  buttonDownload2.position(420 + xOffset + customTileOffset, 205);
+  buttonDownload3.position(420 + xOffset + customTileOffset, 305);
   
   saveButton1.position(420 + xOffset + customTileOffset, 70);
   saveButton2.position(420 + xOffset + customTileOffset, 170);
@@ -146,10 +146,11 @@ function setup() {
   underscoreTag = createP("-------------------------------------------------------------------------------------------");
   descriptionLabel = createP("Details");
   colorLabel = createP("Recommended Colors");
-  //movementLabel = createP("Use WASD or Arrow Keys to move!");
+  movementLabel = createP("Use WASD or <br>Arrow Keys to move!");
   underscoreTag.position(270 + xOffset, 360);
   descriptionLabel.position(270 + xOffset, 340);
   colorLabel.position(800 + xOffset, 340);
+  movementLabel.position(xOffset, 330);
 
 
    // Create number input elements with initial values
@@ -200,19 +201,19 @@ function setup() {
     
     //Create a color picker
     colorPicker1 = createColorPicker(green1);
-    colorPicker1.position(550 + xOffset, 400);
+    colorPicker1.position(560 + xOffset, 400);
     colorPicker2 = createColorPicker(green2);
-    colorPicker2.position(610 + xOffset, 400);
+    colorPicker2.position(620 + xOffset, 400);
     colorPicker3 = createColorPicker(green3); 
-    colorPicker3.position(670 + xOffset, 400);
+    colorPicker3.position(680 + xOffset, 400);
     
     colorPickerSpeck = createColorPicker(speckGreen);
-    colorPickerSpeck.position(470 + xOffset, 525);
+    colorPickerSpeck.position(480 + xOffset, 525);
     
     colorPickerPetal = createColorPicker(currentColorPetal);
-    colorPickerPetal.position(420 + xOffset, 465);
+    colorPickerPetal.position(430 + xOffset, 465);
     colorPickerPistil = createColorPicker(currentColorPistil);
-    colorPickerPistil.position(480 + xOffset, 465);
+    colorPickerPistil.position(490 + xOffset, 465);
 
   // Assign functions to the buttons
   button.mousePressed(() => {
@@ -714,18 +715,18 @@ function playerMovement() {
   let moveY = 0;
 
   // Check for key presses and adjust movement values accordingly
-  if (keyMap[LEFT_ARROW]) {
+  if (keyMap[LEFT_ARROW] || keyMap['a']) {
     moveX -= playerSpeed; // Move left
     isFacingRight = false;
   }
-  if (keyMap[RIGHT_ARROW]) {
+  if (keyMap[RIGHT_ARROW] || keyMap['d']) {
     moveX += playerSpeed; // Move right
     isFacingRight = true;
   }
-  if (keyMap[UP_ARROW]) {
+  if (keyMap[UP_ARROW] || keyMap['w']) {
     moveY -= playerSpeed; // Move up
   }
-  if (keyMap[DOWN_ARROW]) {
+  if (keyMap[DOWN_ARROW] || keyMap['s']) {
     moveY += playerSpeed; // Move down
   }
 
@@ -745,84 +746,86 @@ function playerMovement() {
   if(using64){
     
   
-  if (playerX >= 196) {
-    playerX = 196;
+  if (playerX >= 196 + xOffset) { //Added x offset
+    playerX = 196 + xOffset;
     moveX = 0;
   }
-  if (playerX <= 0) {
-    playerX = 0;
+  if (playerX <= xOffset) {
+    playerX = xOffset;
     moveX = 0;
   }
-  if (playerY <= 265) {
-    playerY = 265;
+  if (playerY <= 365) { //Added 100
+    playerY = 365;
     moveY = 0;
   }
-  if (playerY >= 480) {
-    playerY = 480;
+  if (playerY >= 580) { //Added 100
+    playerY = 580;
     moveY = 0;
   }
   }
   if(using32){
-  if (playerX >= 226) {
-    playerX = 226;
+  if (playerX >= 226 + xOffset) {
+    playerX = 226 + xOffset;
     moveX = 0;
   }
-  if (playerX <= 0) {
-    playerX = 0;
+  if (playerX <= xOffset) {
+    playerX = xOffset;
     moveX = 0;
   }
-  if (playerY <= 275) {
-    playerY = 275;
+  if (playerY <= 375) {
+    playerY = 375;
     moveY = 0;
   }
-  if (playerY >= 500) {
-    playerY = 500;
+  if (playerY >= 600) {
+    playerY = 600;
     moveY = 0;
   }
   }
   if(using16){
-  if (playerX >= 240) {
-    playerX = 240;
+  if (playerX >= 240 + xOffset) {
+    playerX = 240 + xOffset;
     moveX = 0;
   }
-  if (playerX <= 0) {
-    playerX = 0;
+  if (playerX <= xOffset) {
+    playerX = xOffset;
     moveX = 0;
   }
-  if (playerY <= 280) {
-    playerY = 280;
+  if (playerY <= 380) {
+    playerY = 380;
     moveY = 0;
   }
-  if (playerY >= 520) {
-    playerY = 520;
+  if (playerY >= 620) {
+    playerY = 620;
     moveY = 0;
   }
   }
   if(using8){
-  if (playerX >= 240) {
-    playerX = 240;
+  if (playerX >= 240 + xOffset) {
+    playerX = 240 + xOffset;
     moveX = 0;
   }
-  if (playerX <= 0) {
-    playerX = 0;
+  if (playerX <= xOffset) {
+    playerX = xOffset;
     moveX = 0;
   }
-  if (playerY <= 280) {
-    playerY = 280;
+  if (playerY <= 380) {
+    playerY = 380;
     moveY = 0;
   }
-  if (playerY >= 520) {
-    playerY = 520;
+  if (playerY >= 620) {
+    playerY = 620;
     moveY = 0;
   }
   }
 }
 
 function keyPressed(){
+  keyMap[key] = true;
   keyMap[keyCode] = true;
 }
 
 function keyReleased(){
+  delete keyMap[key];
   delete keyMap[keyCode];
 }
 
