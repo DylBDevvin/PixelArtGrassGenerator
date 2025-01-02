@@ -75,8 +75,11 @@ var descriptionLabel;
 var colorLabel;
 var movementLabel;
 var underscoreTag;
-
-
+var customCanvasGuideTag;
+var percentTag1;
+var percentTag2;
+var percentTag3;
+var customTutorialTag;
 
 function preload(){
   //Load all of our sprites
@@ -91,7 +94,9 @@ function setup() {
   displayCanvas.position(xOffset, 20);
   button = createButton("Generate Grass!");
   button.position(xOffset, 100);
-  
+
+  customTutorialTag = createP("Click <br> 'Apply Current Canvas' <br> in the respective slot <br> to save this canvas that slot.");
+  customTutorialTag.position(80 + xOffset, 20);
   recColor1Button = createButton("Standard Color");
   recColor1Button.position(800 + xOffset, 400);
   recColor2Button = createButton("Autumn Color");
@@ -109,14 +114,14 @@ function setup() {
   buttonDownload2 = createButton("Download!");
   buttonDownload3 = createButton("Download!");
   
-  saveButton1 = createButton("Save");
-  saveButton2 = createButton("Save");
-  saveButton3 = createButton("Save");
+  saveButton1 = createButton("Apply Current Canvas!");
+  saveButton2 = createButton("Apply Current Canvas!");
+  saveButton3 = createButton("Apply Current Canvas!");
   
   currentCanvasButton = createButton('Using Current Canvas');
   currentCanvasButton.mousePressed(toggleState);
   
-  applyButton = createButton("Apply Custom Tiles!")
+  applyButton = createButton("Apply!")
   
   flowersButton = createButton("Flowers? ☑");
   grassSpeckButton = createButton("Grass Specks? ☑");
@@ -132,13 +137,15 @@ function setup() {
   buttonDownload2.position(420 + xOffset + customTileOffset, 205);
   buttonDownload3.position(420 + xOffset + customTileOffset, 305);
   
-  saveButton1.position(420 + xOffset + customTileOffset, 70);
-  saveButton2.position(420 + xOffset + customTileOffset, 170);
-  saveButton3.position(420 + xOffset + customTileOffset, 270);
+  saveButton1.position(300 + xOffset + customTileOffset, 70);
+  saveButton2.position(300 + xOffset + customTileOffset, 170);
+  saveButton3.position(300 + xOffset + customTileOffset, 270);
   
   currentCanvasButton.position(510 + xOffset + customTileOffset, 20);
+  customCanvasGuideTag = createP("Create a more <br>varied grass canvas!");
+  customCanvasGuideTag.position(790 + xOffset + customTileOffset, 10);
   
-  applyButton.position(760 + xOffset + customTileOffset, 200);
+  applyButton.position(760 + xOffset + customTileOffset, 330);
   
  // Adjust Flowers, Grass Specks, and Empty buttons
   flowersButton.position(270 + xOffset, 460); // Align with Size: 64 button (x position)
@@ -147,11 +154,11 @@ function setup() {
 
   underscoreTag = createP("-------------------------------------------------------------------------------------------");
   descriptionLabel = createP("Details");
-  colorLabel = createP("Recommended Colors");
+  //colorLabel = createP("Recommended Colors");
   movementLabel = createP("Use WASD or <br>Arrow Keys to move!");
   underscoreTag.position(270 + xOffset, 360);
   descriptionLabel.position(270 + xOffset, 340);
-  colorLabel.position(800 + xOffset, 340);
+  //colorLabel.position(800 + xOffset, 340);
   movementLabel.position(xOffset, 330);
 
 
@@ -159,9 +166,16 @@ function setup() {
   input1 = createInput('33', 'number').attribute('min', 0).attribute('max', 100).position(670 + customTileOffset, 90);
   input2 = createInput('33', 'number').attribute('min', 0).attribute('max', 100).position(670 + customTileOffset, 190);
   input3 = createInput('34', 'number').attribute('min', 0).attribute('max', 100).position(670 + customTileOffset, 290);
+
+  percentTag1 = createP("% Placement Rate");
+  percentTag1.position(745 + customTileOffset, 85);
+  percentTag2 = createP("% Placement Rate");
+  percentTag2.position(745 + customTileOffset, 185);
+  percentTag3 = createP("% Placement Rate");
+  percentTag3.position(745 + customTileOffset, 285);
   
    // Create a warning message element
-  warningMessage = createP('Percentages must sum up to 100!').style('color', 'red').position(550, -10);
+  warningMessage = createP('Percentages must sum up to 100!').style('color', 'red').position(450, 60);
   warningMessage.hide(); // Hide it initially
   
   input1.input(validateSum);
@@ -356,6 +370,10 @@ function setup() {
   savedCopy1.hide();
   savedCopy2.hide();
   savedCopy3.hide();
+  percentTag1.hide();
+  percentTag2.hide();
+  percentTag3.hide();
+  customTutorialTag.hide();
   
 }
 
@@ -851,6 +869,11 @@ function toggleState() {
     savedCopy1.hide();
     savedCopy2.hide();
     savedCopy3.hide();
+    percentTag1.hide();
+    percentTag2.hide();
+    percentTag3.hide();
+    customTutorialTag.hide();
+    customCanvasGuideTag.html("Create a more <br>varied grass canvas!");
     
   } else {
     currentCanvasButton.html('Using Custom Canvas'); 
@@ -867,6 +890,11 @@ function toggleState() {
     savedCopy1.show();
     savedCopy2.show();
     savedCopy3.show();
+    percentTag1.show();
+    percentTag2.show();
+    percentTag3.show();
+    customTutorialTag.show();
+    customCanvasGuideTag.html("Choose your placement <br>percentages and apply!");
     
   }
 }
@@ -959,7 +987,7 @@ function chooseRandomElement() {
 
 function customTile(){
     rowCount = 0;
-    yOffset = 150;
+    yOffset = 250;
     grassImageElements.forEach((element) => element.remove());
     grassImageElements = []; // Reset the array
     grassImage = get(0, 0, sizeX, sizeY); // Store the canvas in the image variable
@@ -983,7 +1011,7 @@ function customTile(){
           yOffset += 64;
         }
         
-        imgElement.position(rowCount * sizeX, 64 + yOffset); // Adjust the position as needed
+        imgElement.position(xOffset + rowCount * sizeX, 64 + yOffset); // Adjust the position as needed
         imgElement.size(sizeX, sizeY); // Set the size of the image element
         imgElement.show(); // Show the image element
         grassImageElements.push(imgElement); // Store it in the array for future use
@@ -1007,7 +1035,7 @@ function customTile(){
           yOffset += 32;
         }
         
-        imgElement.position(rowCount * sizeX, sizeY + 64 + yOffset); // Adjust the position as needed
+        imgElement.position(xOffset + rowCount * sizeX, sizeY + 64 + yOffset); // Adjust the position as needed
         imgElement.size(sizeX, sizeY); // Set the size of the image element
         imgElement.show(); // Show the image element
         grassImageElements.push(imgElement); // Store it in the array for future use
@@ -1030,7 +1058,7 @@ function customTile(){
           yOffset += 16;
         }
         
-        imgElement.position(rowCount * sizeX, sizeY + sizeY + sizeY + 64 + yOffset); // Adjust the position as needed
+        imgElement.position(xOffset + rowCount * sizeX, sizeY + sizeY + sizeY + 64 + yOffset); // Adjust the position as needed
         imgElement.size(sizeX, sizeY); // Set the size of the image element
         imgElement.show(); // Show the image element
         grassImageElements.push(imgElement); // Store it in the array for future use
@@ -1053,7 +1081,7 @@ function customTile(){
           yOffset += 8;
         }
         
-        imgElement.position(rowCount * sizeX, sizeY + sizeY + sizeY + sizeY + sizeY + sizeY + sizeY + 64 + yOffset); // Adjust the position as needed
+        imgElement.position(xOffset + rowCount * sizeX, sizeY + sizeY + sizeY + sizeY + sizeY + sizeY + sizeY + 64 + yOffset); // Adjust the position as needed
         imgElement.size(sizeX, sizeY); // Set the size of the image element
         imgElement.show(); // Show the image element
         grassImageElements.push(imgElement); // Store it in the array for future use
