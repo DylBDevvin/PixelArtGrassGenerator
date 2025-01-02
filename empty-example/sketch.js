@@ -729,6 +729,8 @@ function createPlayer(){
      playerElement = createImg('Player16x16Gif.gif', 'Player');
   }
   
+  playerElement.position(playerX, playerY); // Set the position
+  
 }
 function playerMovement() {
   let moveX = 0;
