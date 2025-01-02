@@ -175,7 +175,7 @@ function setup() {
   percentTag3.position(745 + customTileOffset, 285);
   
    // Create a warning message element
-  warningMessage = createP('Percentages must sum up to 100!').style('color', 'red').position(450, 60);
+  warningMessage = createP('Percentages must sum up to 100!').style('color', 'red').position(470, 105);
   warningMessage.hide(); // Hide it initially
   
   input1.input(validateSum);
@@ -730,7 +730,7 @@ function createPlayer(){
   }
   
   playerElement.position(playerX, playerY); // Set the position
-  
+
 }
 function playerMovement() {
   let moveX = 0;
