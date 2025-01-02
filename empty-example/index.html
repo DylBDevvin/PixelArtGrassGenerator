@@ -33,7 +33,7 @@ body::before {
       transparent 3px,
       rgba(255, 255, 255, 0.03) 5px /* Bright scanlines */
     );
-    /*animation: scanlineMovement 12s linear infinite; */
+    animation: scanlineMovement 12s linear infinite; 
 }
 
 @keyframes scanlineMovement {
@@ -132,6 +132,28 @@ body::before {
         color: #d9eef2
       }
 
+      .bmc-container {
+      position: fixed;
+      bottom: 20px; /* Distance from the bottom */
+      right: 20px;  /* Distance from the right */
+      z-index: 1000; /* Ensures it appears above other elements */
+    }
+
+    .square{
+      width: 500px;
+      height: 50px;
+      background-color: #8da4cc;
+      margin-left: 365px;
+      margin-top: -10px;
+      border-radius: 10px;
+      padding: 10px 20px;
+      display: flex; /* Centers the content horizontally and vertically */
+      align-items: center; /* Vertically aligns the text */
+      justify-content: center; /* Horizontally centers the text */
+      font-size: 18px; /* Adjust the font size as needed */
+      color: #000000; /* Change the text color if needed */
+      font-family: "Press Start 2P", monospace; /* Optional: Apply a pixel art font */
+    }
 
     </style>
   </head>
@@ -140,5 +162,20 @@ body::before {
       <div id = "fake-button" class = "fake-button">Background/Petal/Shade:</div>
     </main>
     <script src="sketch.js"></script>
+    <div class = "bmc-container">
+    <script type="text/javascript"
+     src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" 
+     data-name="bmc-button" 
+     data-slug="DylBDevvin" 
+     data-color="#8da4cc" data-emoji="" 
+      data-font="Lato" 
+      data-text="Buy me a coffee" 
+      data-outline-color="#000000" 
+      data-font-color="#000000" 
+      data-coffee-color="#ffffff" ></script>
+  </div>
+  <div class = "square">
+    Grass Pixel Art Generator
+  </div>
   </body>
 </html>

@@ -76,6 +76,8 @@ var colorLabel;
 var movementLabel;
 var underscoreTag;
 
+
+
 function preload(){
   //Load all of our sprites
   sprite64 = loadImage("Player64x64Gif.gif");
